@@ -1,6 +1,4 @@
 import src.FileLoader
-import src.Scorer
-import src.Compare
 import functools
 import pickle
 import torch
@@ -15,13 +13,14 @@ from sklearn.preprocessing import normalize
 #FileLoader.Download(input("Please input your github url:"))
 #Comments = FileLoader.GetComments('./getFile')
 model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+
 # model = SentenceTransformer('pritamdeka/S-Scibert-snli-multinli-stsb')
 #model = SentenceTransformer('all-mpnet-base-v2')
 #model.load_state_dict(torch.load('model.pt'))
 Comments = src.FileLoader.GetComments(input("Please input your project directory:"))
 corpus = []
-model.cuda()
-model.eval()
+#model.cuda()
+#model.eval()
 with open("comments.pkl", "wb") as f:
     pickle.dump(Comments, f)
 for position, comment in tqdm(Comments):
