@@ -5,7 +5,7 @@ from scipy.spatial import cKDTree
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import normalize
 import pickle
-from normalizor import normalizor
+from utils.normalizor import normalizor
 
 #model = SentenceTransformer('all-mpnet-base-v2')
 model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
