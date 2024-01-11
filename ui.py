@@ -12,7 +12,8 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import normalize
 from utils.normalizor import normalizor
 model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
-model.cuda()
+if torch.cuda.is_available():
+    model.cuda()
 
 app = CTk()
 app.geometry("720x640")
@@ -109,6 +110,10 @@ def init():
     global label
     global loadFileBtn
     global loadWeights
+    global app
+    app.title("Project Searcher")
+    set_appearance_mode("dark")
+    set_default_color_theme("dark-blue")
     tabview = CTkTabview(master=app)
     tabview.configure(width=600)
     tabview.configure(height=500)
