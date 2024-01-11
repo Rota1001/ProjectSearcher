@@ -2,23 +2,15 @@
 import torch
 from sentence_transformers import SentenceTransformer, util
 from scipy.spatial import cKDTree
+from sklearn.neighbors import NearestNeighbors
+from sklearn.preprocessing import normalize
 import pickle
-from llama_cpp import Llama
+from normalizor import normalizor
 
-
-
-model = "llama-pro-8b.Q2_K.gguf"
-model_path = f"./model/{model}"
-llm = Llama(
-    model_path,
-    n_ctx=2048,
-    n_gpu_layers=-1,
-    main_gpu=0,
-    n_threads=1,
-    embedding=True,
-    verbose=False
-)
-
+#model = SentenceTransformer('all-mpnet-base-v2')
+model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+# model = SentenceTransformer('pritamdeka/S-Scibert-snli-multinli-stsb')
+#model = SentenceTransformer('bert-base-uncased')
 tree : cKDTree
 Comments = []
 
@@ -31,14 +23,14 @@ with open("comments.pkl", "rb") as f:
 
 while True:
     sentence = input("Input sentence:")
-    embedding = llm.embed(sentence)
+    embedding = normalizor(model.encode(sentence, convert_to_tensor = False))
     print("==================================================================")
-    #a, b = tree.query(embedding)
-    #print(Comments[b])
+    # print(embedding)
     x, y = tree.query(embedding)
     position, comment = Comments[y]
     print(position)
     print(comment)
+    print("==================================================================")
     #for b in y:
         # position, comment = Comments[b]
         # print(position)

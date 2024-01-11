@@ -2,11 +2,11 @@ import os
 import re
 from tqdm import tqdm
 
-def Download(gitURL):
+def download(gitURL):
 	os.system('rm -rf getFile')
 	os.system('git clone ' + gitURL + ' getFile')
 
-def LoadFiles(directory):
+def loadFiles(directory):
 	files = []
 	for file in os.listdir(directory):
 		if os.path.isfile(os.path.join(directory, file)):
@@ -14,13 +14,14 @@ def LoadFiles(directory):
 			if extension == '.c':
 				files.append(directory + '/' + file)
 		else:
-			temp = LoadFiles(directory + '/' + file)
+			temp = loadFiles(directory + '/' + file)
 			for x in temp:
 				files.append(x)
 	return files
 
-def GetComments(directory):
-	files = LoadFiles(directory)
+
+def getComments(directory):
+	files = loadFiles(directory)
 	finalList = []
 	err = ""
 	for address in tqdm(files):
@@ -32,21 +33,10 @@ def GetComments(directory):
 				a = re.findall(r'//.*?$|/\*.*?\*/|\'(?:\\.|[^\\\'])*\'|"(?:\\.|[^\\"])*"', s,re.DOTALL | re.MULTILINE)
 				comment = ""
 				for b in a:
-					comment += '\n' + b
-				finalList.append((address, comment))
-				#cnt = 0
-				# s = ""
-				# for line in fp:
-				# 	cnt += 1
-				# 	for i in range(len(line) - 1):
-				# 		if line[i] == '/' and line[i + 1] == '/':
-				# 			comment = ''
-				# 			for j in range(i + 2, len(line)):
-				# 				comment += line[j]
-				# 			s += " " + comment
-				# 			#finalList.append((address[10:] + ', line: ' + str(cnt), comment))
-				# 			break
-				# finalList.append((address[10:], s))
+					comment += b
+				comment = re.sub(u"([^\u4e00-\u9fa5\u0030-\u0039\u0041-\u005a\u0061-\u007a])","",comment)
+				if comment != "":
+					finalList.append((address, comment))
 		except:
 			err += "Can't read " + address + "\n"
 	print(err)
