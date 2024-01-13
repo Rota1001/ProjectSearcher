@@ -10,7 +10,8 @@ import tqdm
 import math
 
 #model = SentenceTransformer('all-mpnet-base-v2')
-model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+#model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+model = SentenceTransformer('sentence-t5-large')
 #model = SentenceTransformer('msmarco-distilbert-base-tas-b')
 #model = SentenceTransformer('pritamdeka/S-Scibert-snli-multinli-stsb')
 #model = SentenceTransformer('bert-base-uncased')
@@ -45,7 +46,7 @@ def findFunc(s):
     ret = re.sub(r"[^a-zA-Z]", "", ret)
     return ret
 
-
+print(Comments[4559])
 for num, (position, comment) in enumerate(Comments):
     position = position[39:]
     position = re.sub(u"([^\u4e00-\u9fa5\u0030-\u0039\u0041-\u005a\u0061-\u007a])","",position)
@@ -67,13 +68,15 @@ for num, (position, comment) in enumerate(Comments):
             mp[y] = 1
         a, b = Comments[y]
      #   print(f"key:{comment} result:{b}")
-    if num % 10 == 1:
+    if num % 100 == 1:
         print("[{}/{}]({:.2f}%) correct:{}(rate:{:.2f}%)".format(num, len(Comments), num/len(Comments)*100, correct, correct / (num + 1) * 100))
 
 print('{:.2f}%'.format(correct / len(Comments) * 100))
 print(math.sqrt(dif/len(Comments)))
 ls = sorted(mp.items(), key=lambda item: item[1])
 ls.reverse()
-for key, value in ls:
+for i, (key, value) in enumerate(ls):
     position, comment = Comments[key]
     print("num:{}, value:{}, position:{}".format(key, value, position))
+    if i > 20:
+        break

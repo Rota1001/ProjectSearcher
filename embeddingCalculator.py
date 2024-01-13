@@ -12,8 +12,9 @@ from sklearn.preprocessing import normalize
 
 #FileLoader.Download(input("Please input your github url:"))
 #Comments = FileLoader.GetComments('./getFile')
-model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+#model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
 #
+model = SentenceTransformer('sentence-t5-large')
 
 #model = SentenceTransformer('pritamdeka/S-Scibert-snli-multinli-stsb')
 #model = SentenceTransformer('all-mpnet-base-v2')
