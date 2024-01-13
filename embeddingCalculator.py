@@ -13,14 +13,16 @@ from sklearn.preprocessing import normalize
 #FileLoader.Download(input("Please input your github url:"))
 #Comments = FileLoader.GetComments('./getFile')
 model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+#
 
-# model = SentenceTransformer('pritamdeka/S-Scibert-snli-multinli-stsb')
+#model = SentenceTransformer('pritamdeka/S-Scibert-snli-multinli-stsb')
 #model = SentenceTransformer('all-mpnet-base-v2')
 #model.load_state_dict(torch.load('model.pt'))
 Comments = fileLoader.getComments(input("Please input your project directory:"))
 model.cuda()
 #model.eval()
 tmp = []
+
 with open("comments.pkl", "wb") as f:
     pickle.dump(Comments, f)
 for position, comment in tqdm(Comments):
