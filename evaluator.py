@@ -12,6 +12,8 @@ import math
 #model = SentenceTransformer('all-mpnet-base-v2')
 #model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
 model = SentenceTransformer('sentence-t5-large')
+#model = SentenceTransformer('KnutJaegersberg/infoxlm-large-sentence-embeddings')
+#model = SentenceTransformer('all-roberta-large-v1')
 #model = SentenceTransformer('msmarco-distilbert-base-tas-b')
 #model = SentenceTransformer('pritamdeka/S-Scibert-snli-multinli-stsb')
 #model = SentenceTransformer('bert-base-uncased')
@@ -28,6 +30,7 @@ with open("comments.pkl", "rb") as f:
 correct = 0
 dif = 0
 mp = {}
+ma = 0
 
 def findFunc(s):
     s = re.sub("#.*", "", s)
@@ -46,7 +49,6 @@ def findFunc(s):
     ret = re.sub(r"[^a-zA-Z]", "", ret)
     return ret
 
-print(Comments[4559])
 for num, (position, comment) in enumerate(Comments):
     position = position[39:]
     position = re.sub(u"([^\u4e00-\u9fa5\u0030-\u0039\u0041-\u005a\u0061-\u007a])","",position)
@@ -57,9 +59,9 @@ for num, (position, comment) in enumerate(Comments):
     # s = findFunc(s)
     x, y = tree.query(normalizor(model.encode(position, convert_to_tensor = False)))
     dif += (y - num) ** 2
-    
+    ma = max(ma, abs(y - num))
     #print(abs(y - num))
-    if abs(y - num) < 163:
+    if abs(y - num) < len(Comments) / 100 * 5:
         correct += 1
     else:
         if y in mp:
@@ -72,7 +74,8 @@ for num, (position, comment) in enumerate(Comments):
         print("[{}/{}]({:.2f}%) correct:{}(rate:{:.2f}%)".format(num, len(Comments), num/len(Comments)*100, correct, correct / (num + 1) * 100))
 
 print('{:.2f}%'.format(correct / len(Comments) * 100))
-print(math.sqrt(dif/len(Comments)))
+print(math.sqrt(dif)/len(Comments))
+print(ma)
 ls = sorted(mp.items(), key=lambda item: item[1])
 ls.reverse()
 for i, (key, value) in enumerate(ls):

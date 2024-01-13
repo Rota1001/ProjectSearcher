@@ -9,17 +9,19 @@ from tqdm import tqdm
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import normalize
 
-
+Comments = fileLoader.getComments(input("Please input your project directory:"))
 #FileLoader.Download(input("Please input your github url:"))
 #Comments = FileLoader.GetComments('./getFile')
 #model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
 #
 model = SentenceTransformer('sentence-t5-large')
+#model = SentenceTransformer('KnutJaegersberg/infoxlm-large-sentence-embeddings')
+#model = SentenceTransformer('all-roberta-large-v1')
 
 #model = SentenceTransformer('pritamdeka/S-Scibert-snli-multinli-stsb')
 #model = SentenceTransformer('all-mpnet-base-v2')
 #model.load_state_dict(torch.load('model.pt'))
-Comments = fileLoader.getComments(input("Please input your project directory:"))
+
 model.cuda()
 #model.eval()
 tmp = []
