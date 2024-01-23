@@ -42,7 +42,7 @@ def getComments(directory):
 				# 		comment += word
 				comment = re.sub(r"[^a-zA-Z]", "", comment)
 				#comment = re.sub(u"([^\u4e00-\u9fa5\u0030-\u0039\u0041-\u005a\u0061-\u007a])","",comment)
-				if len(comment) > 300:
+				if len(comment) > 100:
 					finalList.append((address, comment))
 		except:
 			err += "Can't read " + address + "\n"

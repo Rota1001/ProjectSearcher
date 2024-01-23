@@ -8,15 +8,21 @@ import re
 from utils.normalizor import normalizor
 import tqdm
 import math
+# from angle_emb import AnglE
+
+# angle = AnglE.from_pretrained('WhereIsAI/UAE-Large-V1', pooling_strategy='cls').cuda() 
 
 #model = SentenceTransformer('all-mpnet-base-v2')
 #model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
-model = SentenceTransformer('sentence-t5-large')
+#model = SentenceTransformer('sentence-t5-large')
+#model = SentenceTransformer('BAAI/bge-large-en')
 #model = SentenceTransformer('KnutJaegersberg/infoxlm-large-sentence-embeddings')
 #model = SentenceTransformer('all-roberta-large-v1')
 #model = SentenceTransformer('msmarco-distilbert-base-tas-b')
 #model = SentenceTransformer('pritamdeka/S-Scibert-snli-multinli-stsb')
 #model = SentenceTransformer('bert-base-uncased')
+# model = SentenceTransformer('all-mpnet-base-v2')
+model = SentenceTransformer('llmrails/ember-v1')
 tree : cKDTree
 Comments = []
 
@@ -57,29 +63,35 @@ for num, (position, comment) in enumerate(Comments):
     #     for line in fp:
     #         s += line
     # s = findFunc(s)
-    x, y = tree.query(normalizor(model.encode(position, convert_to_tensor = False)))
-    dif += (y - num) ** 2
-    ma = max(ma, abs(y - num))
+   # q = tree.query(normalizor(list(angle.encode(position, to_numpy=True)[0])), 5)[1]
+    q = tree.query(normalizor(model.encode(position, convert_to_tensor = False)), 5)[1]
+    for y in q:
+        if abs(y - num) < len(Comments) / 100:
+            correct += 1
+            break
+            
+   # dif += (y - num) ** 2
+    #ma = max(ma, abs(y - num))
     #print(abs(y - num))
-    if abs(y - num) < len(Comments) / 100 * 5:
-        correct += 1
-    else:
-        if y in mp:
-            mp[y] += 1
-        else:
-            mp[y] = 1
-        a, b = Comments[y]
+    # if abs(y - num) < len(Comments) / 100:
+    #     correct += 1
+    # else:
+    #     if y in mp:
+    #         mp[y] += 1
+    #     else:
+    #         mp[y] = 1
+    #     a, b = Comments[y]
      #   print(f"key:{comment} result:{b}")
     if num % 100 == 1:
         print("[{}/{}]({:.2f}%) correct:{}(rate:{:.2f}%)".format(num, len(Comments), num/len(Comments)*100, correct, correct / (num + 1) * 100))
 
 print('{:.2f}%'.format(correct / len(Comments) * 100))
-print(math.sqrt(dif)/len(Comments))
-print(ma)
-ls = sorted(mp.items(), key=lambda item: item[1])
-ls.reverse()
-for i, (key, value) in enumerate(ls):
-    position, comment = Comments[key]
-    print("num:{}, value:{}, position:{}".format(key, value, position))
-    if i > 20:
-        break
+#print(math.sqrt(dif)/len(Comments))
+#print(ma)
+# ls = sorted(mp.items(), key=lambda item: item[1])
+# ls.reverse()
+# for i, (key, value) in enumerate(ls):
+#     position, comment = Comments[key]
+#     print("num:{}, value:{}, position:{}".format(key, value, position))
+#     if i > 20:
+#         break

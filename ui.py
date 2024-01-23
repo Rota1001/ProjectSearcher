@@ -11,7 +11,8 @@ from tqdm import tqdm
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import normalize
 from utils.normalizor import normalizor
-model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+# model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+model = SentenceTransformer('all-roberta-large-v1')
 if torch.cuda.is_available():
     model.cuda()
 
