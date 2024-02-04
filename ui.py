@@ -11,6 +11,7 @@ from tqdm import tqdm
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import normalize
 from utils.normalizor import normalizor
+import re
 # model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
 model = SentenceTransformer('all-roberta-large-v1')
 if torch.cuda.is_available():
@@ -48,10 +49,10 @@ def loadWeight(msg="Weight loaded"):
     global tree
     global comments
     try:
-        with open("data.pkl", "rb") as f:
+        with open("data/data.pkl", "rb") as f:
             raw = pickle.load(f)
             tree = pickle.loads(raw)
-        with open("comments.pkl", "rb") as f:
+        with open("data/comments.pkl", "rb") as f:
             comments = pickle.load(f)
         if msg != '':
             label.configure(text=msg)
@@ -67,14 +68,16 @@ def loadFile():
     try: 
         comments = fileLoader.getComments(filePath)
         tmp = []
-        with open("comments.pkl", "wb") as f:
+        with open("data/comments.pkl", "wb") as f:
             pickle.dump(comments, f)
         for position, comment in tqdm(comments):
-            tmp.append(model.encode(comment, convert_to_tensor=False))
+            x = position[39:]
+            x = re.sub(u"([^\u4e00-\u9fa5\u0030-\u0039\u0041-\u005a\u0061-\u007a])","",x)
+            tmp.append(model.encode(x, convert_to_tensor=False))
         tmpnor = normalize(tmp, norm='l2')
         tree = cKDTree(tmpnor)
         raw = pickle.dumps(tree)
-        with open("data.pkl", "wb") as f:
+        with open("data/data.pkl", "wb") as f:
             pickle.dump(raw, f)
         label.configure(text="File loaded\r\nPath:"+filePath)
         loadWeight("")
@@ -96,12 +99,13 @@ def search():
         return
     try:
         embedding = normalizor(model.encode(userInput.get(), convert_to_tensor=False))
-        x, y = tree.query(embedding)
-        position, comment = comments[y]
+        y = tree.query(embedding, 5)[1]
         deleteMessage()
-        insertMessage(position)
-        insertMessage("\r\n")
-        insertMessage(comment)
+        for i in y:
+            position, comment = comments[i]
+            insertMessage(position)
+            insertMessage("\r\n")
+       # insertMessage(comment)
     except:
         deleteMessage()
         insertMessage("Something Wrong")
