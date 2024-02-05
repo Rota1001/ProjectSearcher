@@ -12,7 +12,8 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import normalize
 from utils.normalizor import normalizor
 import re
-# model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+import threading
+
 model = SentenceTransformer('all-roberta-large-v1')
 if torch.cuda.is_available():
     model.cuda()
@@ -65,17 +66,23 @@ def loadFile():
     filePath = entry.get()
     pathLen = len(filePath)
     comments = []
-    print(pathLen + 1)
     global label
     try: 
+        label.configure(text="File Loading...")
         comments = fileLoader.getComments(filePath)
         tmp = []
         with open("data/comments.pkl", "wb") as f:
             pickle.dump(comments, f)
+        commentLen = len(comments)
+        cnt = 0
+        label.configure(text="Start Embedding")
         for position, comment in tqdm(comments):
+            cnt += 1
             x = position[pathLen + 1:]
             # x = re.sub(u"([^\u4e00-\u9fa5\u0030-\u0039\u0041-\u005a\u0061-\u007a])","",x)
             tmp.append(model.encode(x, convert_to_tensor=False))
+            if cnt % 10 == 0:
+                label.configure(text="{:.2f}%".format(cnt / commentLen * 100))
         tmpnor = normalize(tmp, norm='l2')
         tree = cKDTree(tmpnor)
         raw = pickle.dumps(tree)
@@ -87,6 +94,9 @@ def loadFile():
         label.configure(text="Can't open this folder")
     entry.delete(0, 'end')
 
+def loadTheFile():
+    loading = threading.Thread(target=loadFile)
+    loading.start()
 
 def search():
     global tree
@@ -139,7 +149,7 @@ def init():
                         border_color="#FFCC70", 
                         border_width=2, 
                         font=("Comic Sans MS", 15, "bold"),
-                        command=loadFile
+                        command=loadTheFile
                         )
     loadWeights = CTkButton(master=tabview.tab("Load File"), 
                         text="Load Weights", 

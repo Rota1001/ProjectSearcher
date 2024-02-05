@@ -30,7 +30,7 @@ with open("data/comments.pkl", "wb") as f:
 for position, comment in tqdm(Comments):
    # tmp.append(list(angle.encode(comment, to_numpy=True)[0]))
     x = position[39:]
-    x = x.replace("/", " ")
+    # x = x.replace("/", " ")
   #  x = re.sub(u"([^\u4e00-\u9fa5\u0030-\u0039\u0041-\u005a\u0061-\u007a])"," ",x)
     tmp.append(model.encode(x, convert_to_tensor = False))
 tmpnor = normalize(tmp, norm='l2')
