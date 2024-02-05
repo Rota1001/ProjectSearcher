@@ -13,10 +13,14 @@ from sklearn.preprocessing import normalize
 from utils.normalizor import normalizor
 import re
 import threading
+import os
 
 model = SentenceTransformer('all-roberta-large-v1')
 if torch.cuda.is_available():
     model.cuda()
+
+if not os.path.isdir("data"):
+    os.mkdir("data")
 
 app = CTk()
 app.geometry("720x640")
