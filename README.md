@@ -4,6 +4,7 @@ This project use machine learning technique to help you to search what you want 
 ## Installation
 ```shell
 git clone https://github.com/Rota1001/ProjectSearcher.git
+cd ProjectSearcher
 pip3 install -r requirements.txt
 ```
 If you want to use gpu, please set up your Pytorch environment yourself, or you can just use cpu version as well.
