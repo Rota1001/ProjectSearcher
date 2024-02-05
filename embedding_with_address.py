@@ -24,10 +24,14 @@ tmp = []
 
 with open("data/comments.pkl", "wb") as f:
     pickle.dump(Comments, f)
+# with open("data/comments.pkl", "rb") as f:
+#     Comments = pickle.load(f)
+
 for position, comment in tqdm(Comments):
    # tmp.append(list(angle.encode(comment, to_numpy=True)[0]))
     x = position[39:]
-    x = re.sub(u"([^\u4e00-\u9fa5\u0030-\u0039\u0041-\u005a\u0061-\u007a])","",x)
+    x = x.replace("/", " ")
+  #  x = re.sub(u"([^\u4e00-\u9fa5\u0030-\u0039\u0041-\u005a\u0061-\u007a])"," ",x)
     tmp.append(model.encode(x, convert_to_tensor = False))
 tmpnor = normalize(tmp, norm='l2')
 tree = cKDTree(tmpnor)

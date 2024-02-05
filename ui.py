@@ -63,7 +63,9 @@ def loadWeight(msg="Weight loaded"):
 def loadFile():
     global entry
     filePath = entry.get()
+    pathLen = len(filePath)
     comments = []
+    print(pathLen + 1)
     global label
     try: 
         comments = fileLoader.getComments(filePath)
@@ -71,8 +73,8 @@ def loadFile():
         with open("data/comments.pkl", "wb") as f:
             pickle.dump(comments, f)
         for position, comment in tqdm(comments):
-            x = position[39:]
-            x = re.sub(u"([^\u4e00-\u9fa5\u0030-\u0039\u0041-\u005a\u0061-\u007a])","",x)
+            x = position[pathLen + 1:]
+            # x = re.sub(u"([^\u4e00-\u9fa5\u0030-\u0039\u0041-\u005a\u0061-\u007a])","",x)
             tmp.append(model.encode(x, convert_to_tensor=False))
         tmpnor = normalize(tmp, norm='l2')
         tree = cKDTree(tmpnor)

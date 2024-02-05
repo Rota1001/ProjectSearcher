@@ -43,39 +43,30 @@ def getComments(directory):
 				for line in fp:
 					s += line
 				a = re.findall(r'//.*?$|/\*.*?\*/|\'(?:\\.|[^\\\'])*\'|"(?:\\.|[^\\"])*"', s,re.DOTALL | re.MULTILINE)
-				comment = ""
+				
+				tmp = ""
+				for i in a:
+					tmp += i
 
-				# fileName = address[:-1]
-				# fileName = model.encode(fileName, convert_to_tensor=True)
-				# words = a
+			#	tmp = re.sub(r"[^a-zA-Z]", " ", tmp)
 
-
-				fileName = re.sub(r"[^a-zA-Z]", "", address[39:-1])
-				fileName = model.encode(fileName, convert_to_tensor=True)
-				words = [re.sub(r"[^a-zA-Z]", "", b) for b in a]
-				embeddings = model.encode(words, convert_to_tensor=True)
-				similarity = util.cos_sim(embeddings, fileName).cpu().numpy()
-
-
-				for i in range(len(similarity)):
-					if similarity[i][0] > 0.6:
-						comment += words[i]				
-
-
-
-				# for b in a:
-				# 	b = re.sub(r"[^a-zA-Z]", "", b)
-				# 	if score(b, fileName) > 0.7:
-				# 		comment += b
-				# cmt = comment.split(' ')
 				# comment = ""
-				# for word in cmt:
-				# 	if word not in forbidden:
-				# 		comment += word
-				# comment = re.sub(r"[^a-zA-Z]", "", comment)
-				#comment = re.sub(u"([^\u4e00-\u9fa5\u0030-\u0039\u0041-\u005a\u0061-\u007a])","",comment)
-				if len(comment) > 0:
-					finalList.append((address, comment))
+
+
+
+				# fileName = re.sub(r"[^a-zA-Z]", "", address[39:-1])
+				# fileName = model.encode(fileName, convert_to_tensor=True)
+				# words = [re.sub(r"[^a-zA-Z]", "", b) for b in a]
+				# embeddings = model.encode(words, convert_to_tensor=True)
+				# similarity = util.cos_sim(embeddings, fileName).cpu().numpy()
+				# for i in range(len(similarity)):
+				# 	if similarity[i][0] > 0.5:
+				# 		comment += words[i]				
+
+
+				# if len(comment) > 0:
+				# 	finalList.append((address, comment))
+				finalList.append((address, tmp))
 		except:
 			err += "Can't read " + address + "\n"
 	print(err)
