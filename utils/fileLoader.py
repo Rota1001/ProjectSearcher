@@ -40,8 +40,9 @@ def getComments(directory):
 				a = re.findall(r'//.*?$|/\*.*?\*/|\'(?:\\.|[^\\\'])*\'|"(?:\\.|[^\\"])*"', s,re.DOTALL | re.MULTILINE)
 				comment = ""
 				for word in a:
-					comment += word
-				# comment = re.sub(r"[^a-zA-Z]", "", comment)
+					if address not in word:
+						comment += word
+				# print(comment)
 			#	if len(comment) > 100:
 				finalList.append((address, comment))
 		except:

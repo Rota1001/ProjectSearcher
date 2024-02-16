@@ -14,6 +14,7 @@ from utils.normalizor import normalizor
 import re
 import threading
 import os
+import json
 
 model = SentenceTransformer('all-roberta-large-v1')
 if torch.cuda.is_available():
@@ -40,6 +41,9 @@ searchBtn : CTkButton
 tree : cKDTree
 comments = []
 k = 5
+onlyShowImportant = BooleanVar(value=False)
+pathLen: int
+# cleanPathVar = BooleanVar(value=True)
 
 def deleteMessage():
     outputMessage.configure(state="normal")
@@ -62,18 +66,30 @@ def loadWeight(msg="Weight loaded"):
             tree = pickle.loads(raw)
         with open("data/comments.pkl", "rb") as f:
             comments = pickle.load(f)
+        with open("data/information.json", "rb") as f:
+            tmp = json.load(f)
+            global pathLen
+            pathLen = tmp["pathLen"]
         if msg != '':
             label.configure(text=msg)
     except:
         label.configure(text="Fail to load weights")
             
+def cleanPathOption():
+   # onlyShowImportant = check_var.get()
+    print("hello")
 
 def loadFile():
     global entry
     filePath = entry.get()
     if filePath == "":
         filePath = filedialog.askdirectory()
+    global pathLen
     pathLen = len(filePath)
+    with open("data/information.json", "w") as f:
+            tmp = {}
+            tmp["pathLen"] = pathLen
+            json.dump(tmp, f)
     comments = []
     global label
     try: 
@@ -127,6 +143,8 @@ def search():
         deleteMessage()
         for i in y:
             position, comment = comments[i]
+            if onlyShowImportant.get():
+                position = position[pathLen:]
             insertMessage(position)
             insertMessage("\r\n")
        # insertMessage(comment)
@@ -233,6 +251,9 @@ def modelSettingInit():
     kCombobox.configure(width=400)
     kLabel = CTkLabel(master=tabview.tab("Model Setting"), text="k", font=("Comic Sans MS", 15, "bold"))
     kLabel.place(relx=0.13, rely = 0.5, anchor="center")
+
+    checkBox = CTkCheckBox(master=tabview.tab("Model Setting"), text="Show clean path", font=("Comic Sans MS", 15, "bold"),variable=onlyShowImportant, onvalue=True, offvalue=False)
+    checkBox.place(relx=0.25, rely=0.7, anchor="center")
 
 def init():
     global app
