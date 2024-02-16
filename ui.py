@@ -36,6 +36,8 @@ loadWeights : CTkButton
 #Tab of searching
 userInput : CTkEntry
 outputMessage : CTkTextbox
+outputMessageFrame : CTkScrollableFrame
+outputMessageList = []
 searchBtn : CTkButton
 
 tree : cKDTree
@@ -46,14 +48,37 @@ pathLen: int
 # cleanPathVar = BooleanVar(value=True)
 
 def deleteMessage():
-    outputMessage.configure(state="normal")
-    outputMessage.delete(0.0, 'end')
-    outputMessage.configure(state="disabled")
+    # outputMessage.configure(state="normal")
+    # outputMessage.delete(0.0, 'end')
+    # outputMessage.configure(state="disabled")
+    for i in outputMessageList:
+        i[0].destroy()
+    outputMessageList.clear()
 
-def insertMessage(msg):
-    outputMessage.configure(state="normal")
-    outputMessage.insert('end', msg)
-    outputMessage.configure(state="disabled")
+def vscode(x):
+    if outputMessageList[x][1] != "":
+        os.system("code " + outputMessageList[x][1])
+
+def insertMessage(msg, path = ""):
+    global outputMessageList
+    global outputMessageFrame
+    # outputMessage.configure(state="normal")
+    # outputMessage.insert('end', msg)
+    # outputMessage.configure(state="disabled")
+    cnt = len(outputMessageList)
+    btn = CTkButton(outputMessageFrame, text=msg, 
+            corner_radius=32, 
+            fg_color="transparent", 
+            hover_color="#4158D0", 
+            border_color="#FFCC70", 
+            border_width=2, 
+            width=500,
+            font=("Comic Sans MS", 15, "bold"),
+            command=lambda:vscode(cnt),
+            anchor="w"
+            )
+    btn.pack(pady=10)
+    outputMessageList.append((btn, path))
 
 
 def loadWeight(msg="Weight loaded"):
@@ -79,17 +104,18 @@ def cleanPathOption():
    # onlyShowImportant = check_var.get()
     print("hello")
 
+loading = False
 def loadFile():
+    global loading
+    if loading:
+        return
+    loading = True
     global entry
     filePath = entry.get()
     if filePath == "":
         filePath = filedialog.askdirectory()
     global pathLen
     pathLen = len(filePath)
-    with open("data/information.json", "w") as f:
-            tmp = {}
-            tmp["pathLen"] = pathLen
-            json.dump(tmp, f)
     comments = []
     global label
     try: 
@@ -117,9 +143,14 @@ def loadFile():
             pickle.dump(raw, f)
         label.configure(text="File loaded\r\nPath:"+filePath)
         loadWeight("")
+        with open("data/information.json", "w") as f:
+                tmp = {}
+                tmp["pathLen"] = pathLen
+                json.dump(tmp, f)
     except:
         label.configure(text="Can't open this folder")
     entry.delete(0, 'end')
+    loading = False
 
 def loadTheFile():
     loading = threading.Thread(target=loadFile)
@@ -143,10 +174,10 @@ def search():
         deleteMessage()
         for i in y:
             position, comment = comments[i]
+            tmp = position
             if onlyShowImportant.get():
                 position = position[pathLen:]
-            insertMessage(position)
-            insertMessage("\r\n")
+            insertMessage(position, tmp)
        # insertMessage(comment)
     except:
         deleteMessage()
@@ -208,8 +239,12 @@ def searchInit():
     global tabview
     tabview.add("  Search  ")
     global outputMessage
+    global outputMessageFrame
     global searchBtn
     global userInput
+    outputMessageFrame = CTkScrollableFrame(master=tabview.tab("  Search  "), corner_radius=20)
+    outputMessageFrame.place(relx=0.5, rely=0.35, anchor="center")
+    outputMessageFrame.configure(width=500, height=300)
     outputMessage = CTkTextbox(master=tabview.tab("  Search  "), font=("Comic Sans MS", 15), state="disabled", corner_radius=20)
     searchBtn = CTkButton(master=tabview.tab("  Search  "), 
                         text="Search", 
@@ -223,8 +258,8 @@ def searchInit():
                         )
     userInput = CTkEntry(master=tabview.tab("  Search  "), placeholder_text="Describe your request", font=("Comic Sans MS", 15, "bold"))
     userInput.configure(width=400)
-    outputMessage.place(relx=0.5, rely=0.35, anchor="center")
-    outputMessage.configure(width=500, height=300)
+    #outputMessage.place(relx=0.5, rely=0.35, anchor="center")
+    #outputMessage.configure(width=500, height=300)
     userInput.place(relx=0.5, rely=0.8, anchor="center")
     searchBtn.place(relx=0.5, rely=0.9, anchor="center")
 

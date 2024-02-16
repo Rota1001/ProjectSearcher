@@ -47,7 +47,7 @@ def getComments(directory):
 				finalList.append((address, comment))
 		except:
 			err += "Can't read " + address + "\n"
-	print(err)
+	#print(err)
 	print("Files Loaded")
 	return finalList
 
