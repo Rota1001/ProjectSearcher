@@ -41,9 +41,9 @@ def getComments(directory):
 				comment = ""
 				for word in a:
 					comment += word
-				comment = re.sub(r"[^a-zA-Z]", "", comment)
-				if len(comment) > 100:
-					finalList.append((address, comment))
+				# comment = re.sub(r"[^a-zA-Z]", "", comment)
+			#	if len(comment) > 100:
+				finalList.append((address, comment))
 		except:
 			err += "Can't read " + address + "\n"
 	print(err)

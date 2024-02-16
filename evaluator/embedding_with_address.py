@@ -1,5 +1,5 @@
-# import utils.fileLoader as fileLoader
-import fileLoader_with_sentence_comparison as fileLoader
+import utils.fileLoader as fileLoader
+# import fileLoader_with_sentence_comparison as fileLoader
 import functools
 import pickle
 import torch
@@ -28,7 +28,6 @@ with open("data/comments.pkl", "wb") as f:
 #     Comments = pickle.load(f)
 
 for position, comment in tqdm(Comments):
-   # tmp.append(list(angle.encode(comment, to_numpy=True)[0]))
     x = position[39:]
     # x = x.replace("/", " ")
   #  x = re.sub(u"([^\u4e00-\u9fa5\u0030-\u0039\u0041-\u005a\u0061-\u007a])"," ",x)

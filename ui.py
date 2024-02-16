@@ -23,7 +23,8 @@ if not os.path.isdir("data"):
     os.mkdir("data")
 
 app = CTk()
-app.geometry("720x640")
+app.geometry("720x600")
+app.focus()
 tabview : CTkTabview
 #Tab of loading file
 entry : CTkEntry
@@ -38,6 +39,7 @@ searchBtn : CTkButton
 
 tree : cKDTree
 comments = []
+k = 5
 
 def deleteMessage():
     outputMessage.configure(state="normal")
@@ -53,6 +55,7 @@ def insertMessage(msg):
 def loadWeight(msg="Weight loaded"):
     global tree
     global comments
+    global label
     try:
         with open("data/data.pkl", "rb") as f:
             raw = pickle.load(f)
@@ -68,10 +71,14 @@ def loadWeight(msg="Weight loaded"):
 def loadFile():
     global entry
     filePath = entry.get()
+    if filePath == "":
+        filePath = filedialog.askdirectory()
     pathLen = len(filePath)
     comments = []
     global label
     try: 
+        entry.delete(0, 'end')
+        entry.insert(0, filePath)
         label.configure(text="File Loading...")
         comments = fileLoader.getComments(filePath)
         tmp = []
@@ -86,7 +93,7 @@ def loadFile():
             # x = re.sub(u"([^\u4e00-\u9fa5\u0030-\u0039\u0041-\u005a\u0061-\u007a])","",x)
             tmp.append(model.encode(x, convert_to_tensor=False))
             if cnt % 10 == 0:
-                label.configure(text="{:.2f}%".format(cnt / commentLen * 100))
+                label.configure(text="Embedding: {:.2f}%".format(cnt / commentLen * 100))
         tmpnor = normalize(tmp, norm='l2')
         tree = cKDTree(tmpnor)
         raw = pickle.dumps(tree)
@@ -105,6 +112,7 @@ def loadTheFile():
 def search():
     global tree
     global comments
+    global k
     if len(comments) == 0:
         deleteMessage()
         insertMessage("Weights not loaded yet")
@@ -115,7 +123,7 @@ def search():
         return
     try:
         embedding = normalizor(model.encode(userInput.get(), convert_to_tensor=False))
-        y = tree.query(embedding, 5)[1]
+        y = tree.query(embedding, k)[1]
         deleteMessage()
         for i in y:
             position, comment = comments[i]
@@ -125,27 +133,33 @@ def search():
     except:
         deleteMessage()
         insertMessage("Something Wrong")
-def init():
+
+def modelSelect(value):
+    global comments
+    global model
+    global label
+    model = SentenceTransformer(value)
+    if torch.cuda.is_available():
+        model.cuda()
+    comments = []
+    print("done")
+    label.configure(text="")
+
+def kSelect(value):
+    global k
+    k = int(value)
+
+def loadFileInit():
     global tabview
     global entry
     global label
     global loadFileBtn
     global loadWeights
-    global app
-    app.title("Project Searcher")
-    set_appearance_mode("dark")
-    set_default_color_theme("dark-blue")
-    tabview = CTkTabview(master=app)
-    tabview.configure(width=600)
-    tabview.configure(height=500)
-    tabview.configure(CTkFont("Comic Sans MS", 20, "bold"))
-    tabview.pack(padx=20, pady=20)
-    tabview.add("Load File")
-    tabview.add("Search")
-    entry = CTkEntry(master=tabview.tab("Load File"), placeholder_text="Input your project path", font=("Comic Sans MS", 15, "bold"))
+    tabview.add("  Load File  ")
+    entry = CTkEntry(master=tabview.tab("  Load File  "), placeholder_text="Input your project path", font=("Comic Sans MS", 15, "bold"))
     entry.configure(width=400)
-    label = CTkLabel(master=tabview.tab("Load File"), text="Hello", font=("Comic Sans MS", 15, "bold"))
-    loadFileBtn = CTkButton(master=tabview.tab("Load File"), 
+    label = CTkLabel(master=tabview.tab("  Load File  "), text="Hello", font=("Comic Sans MS", 15, "bold"))
+    loadFileBtn = CTkButton(master=tabview.tab("  Load File  "), 
                         text="Load Files", 
                         corner_radius=32, 
                         fg_color="transparent", 
@@ -155,7 +169,7 @@ def init():
                         font=("Comic Sans MS", 15, "bold"),
                         command=loadTheFile
                         )
-    loadWeights = CTkButton(master=tabview.tab("Load File"), 
+    loadWeights = CTkButton(master=tabview.tab("  Load File  "), 
                         text="Load Weights", 
                         corner_radius=32, 
                         fg_color="transparent", 
@@ -165,17 +179,21 @@ def init():
                         font=("Comic Sans MS", 15, "bold"),
                         command=loadWeight
                         )
-    label.place(relx=0.5, rely=0.35,anchor="center")
-    entry.place(relx=0.5, rely=0.5,anchor="center")
+    label.place(relx=0.5, rely=0.25,anchor="center")
+    entry.place(relx=0.5, rely=0.4,anchor="center")
     loadFileBtn.configure(height=30)
-    loadFileBtn.place(relx=0.35, rely=0.7, anchor="center")
+    loadFileBtn.place(relx=0.35, rely=0.6, anchor="center")
     loadWeights.configure(height=30)
-    loadWeights.place(relx=0.65, rely=0.7, anchor="center")
+    loadWeights.place(relx=0.65, rely=0.6, anchor="center")
+
+def searchInit():
+    global tabview
+    tabview.add("  Search  ")
     global outputMessage
     global searchBtn
     global userInput
-    outputMessage = CTkTextbox(master=tabview.tab("Search"), font=("Comic Sans MS", 15), state="disabled")
-    searchBtn = CTkButton(master=tabview.tab("Search"), 
+    outputMessage = CTkTextbox(master=tabview.tab("  Search  "), font=("Comic Sans MS", 15), state="disabled", corner_radius=20)
+    searchBtn = CTkButton(master=tabview.tab("  Search  "), 
                         text="Search", 
                         corner_radius=32, 
                         fg_color="transparent", 
@@ -185,13 +203,46 @@ def init():
                         font=("Comic Sans MS", 15, "bold"),
                         command=search
                         )
-    userInput = CTkEntry(master=tabview.tab("Search"), placeholder_text="Describe your request", font=("Comic Sans MS", 15, "bold"))
+    userInput = CTkEntry(master=tabview.tab("  Search  "), placeholder_text="Describe your request", font=("Comic Sans MS", 15, "bold"))
     userInput.configure(width=400)
     outputMessage.place(relx=0.5, rely=0.35, anchor="center")
     outputMessage.configure(width=500, height=300)
     userInput.place(relx=0.5, rely=0.8, anchor="center")
     searchBtn.place(relx=0.5, rely=0.9, anchor="center")
 
+def tabInit():
+    global tabview
+    tabview = CTkTabview(master=app, corner_radius=20)
+    tabview.configure(width=600)
+    tabview.configure(height=500)
+    tabview.configure(CTkFont("Comic Sans MS", 20, "bold"))
+    tabview.pack(padx=20, pady=20)
+    
+def modelSettingInit():
+    global tabview
+    tabview.add("Model Setting")
+    modelCombobox = CTkComboBox(master=tabview.tab("Model Setting"), values=["all-roberta-large-v1", "paraphrase-multilingual-MiniLM-L12-v2"], font=("Comic Sans MS", 15, "bold"), command=modelSelect)
+    modelCombobox.configure(width=400)
+    modelCombobox.place(relx=0.55, rely=0.3, anchor="center")
+    modelLabel = CTkLabel(master=tabview.tab("Model Setting"), text="Model", font=("Comic Sans MS", 15, "bold"))
+    modelLabel.place(relx=0.13, rely = 0.3, anchor="center")
+
+    kCombobox =  CTkComboBox(master=tabview.tab("Model Setting"), values=["1", "2", "5", "10", "20", "100"], font=("Comic Sans MS", 15, "bold"), command=kSelect)
+    kCombobox.set("5")
+    kCombobox.place(relx=0.55, rely=0.5, anchor="center")
+    kCombobox.configure(width=400)
+    kLabel = CTkLabel(master=tabview.tab("Model Setting"), text="k", font=("Comic Sans MS", 15, "bold"))
+    kLabel.place(relx=0.13, rely = 0.5, anchor="center")
+
+def init():
+    global app
+    app.title("Project Searcher")
+    set_appearance_mode("dark")
+    set_default_color_theme("dark-blue")
+    tabInit()
+    loadFileInit()
+    modelSettingInit()
+    searchInit()
     
 
 
