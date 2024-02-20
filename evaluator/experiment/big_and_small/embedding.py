@@ -28,7 +28,8 @@ with open("data/comments.pkl", "wb") as f:
 #     Comments = pickle.load(f)
 
 for position, comment in tqdm(Comments):
-    x = position[39:]
+    # x = position[39:]
+    x = comment
     # x = x.replace("/", " ")
   #  x = re.sub(u"([^\u4e00-\u9fa5\u0030-\u0039\u0041-\u005a\u0061-\u007a])"," ",x)
     tmp.append(model.encode(x, convert_to_tensor = False))
