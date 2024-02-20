@@ -15,8 +15,8 @@ import re
 
 Comments = fileLoader.getComments(input("Please input your project directory:"))
 
-model = SentenceTransformer('all-roberta-large-v1')
-# model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+# model = SentenceTransformer('all-roberta-large-v1')
+model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
 
 model.cuda()
 model.eval()
@@ -28,8 +28,8 @@ with open("data/comments.pkl", "wb") as f:
 #     Comments = pickle.load(f)
 
 for position, comment in tqdm(Comments):
-    # x = position[39:]
-    x = comment
+    x = position[39:]
+    # x = comment
     # x = x.replace("/", " ")
   #  x = re.sub(u"([^\u4e00-\u9fa5\u0030-\u0039\u0041-\u005a\u0061-\u007a])"," ",x)
     tmp.append(model.encode(x, convert_to_tensor = False))
