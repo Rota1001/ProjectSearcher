@@ -27,8 +27,20 @@ python3 ui.py
 ### 搜尋
 - Search
   
-  輸入要搜尋的東西的描述，按下`Search`鍵即可進行搜尋
+  在`Search`頁面，輸入要搜尋的東西的描述，按下`Search`鍵即可進行搜尋
 - 開啟檔案
 
   搜尋結果是按鈕，按下後會在VSCode裡打開。如果沒辦法使用，請在環境變數中加入VSCode。
-  
+
+### 模型設定
+模型設定在`model setting`頁面中
+- model
+
+  可以設定要使用的model
+- k
+
+  可以設定一次搜尋所要顯示的數量
+- Show clean path
+
+  可以去除路徑的前墜，增加可讀性
+
